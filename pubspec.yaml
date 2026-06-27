@@ -1,0 +1,29 @@
+name: hovr_local_and_push_notification
+description: Local and push (FCM) notifications for HOVR rider apps.
+version: 0.1.0
+homepage: https://github.com/vishalsharma-hovr/hovr_local_and_push_notification
+repository: https://github.com/vishalsharma-hovr/hovr_local_and_push_notification
+publish_to: none
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.hovr.hovr_local_and_push_notification
+        pluginClass: HovrLocalAndPushNotificationPlugin
+      ios:
+        pluginClass: HovrLocalAndPushNotificationPlugin
