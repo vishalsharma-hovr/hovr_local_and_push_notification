@@ -15,33 +15,45 @@ internal object LocalNotificationPresenter {
             return
         }
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
-        manager.createNotificationChannel(
-            NotificationChannel(
-                NotificationChannelIds.RIDE_STATUS,
-                "Ride updates",
-                NotificationManager.IMPORTANCE_HIGH,
-            ).apply {
-                description = "Active ride status and driver alerts"
-            },
+        createChannel(
+            manager = manager,
+            id = NotificationChannelIds.RIDE_STATUS,
+            name = "Ride updates",
+            importance = NotificationManager.IMPORTANCE_HIGH,
+            description = "Active ride status and driver alerts",
         )
-        manager.createNotificationChannel(
-            NotificationChannel(
-                NotificationChannelIds.RIDE_PROMO,
-                "Offers & tips",
-                NotificationManager.IMPORTANCE_LOW,
-            ).apply {
-                description = "Promotions and recommendations"
-            },
+        createChannel(
+            manager = manager,
+            id = NotificationChannelIds.RIDE_PROMO,
+            name = "Offers & tips",
+            importance = NotificationManager.IMPORTANCE_LOW,
+            description = "Promotions and recommendations",
         )
-        manager.createNotificationChannel(
-            NotificationChannel(
-                NotificationChannelIds.LOCAL_DEFAULT,
-                "App alerts",
-                NotificationManager.IMPORTANCE_DEFAULT,
-            ).apply {
-                description = "In-app and local alerts"
-            },
+        createChannel(
+            manager = manager,
+            id = NotificationChannelIds.LOCAL_DEFAULT,
+            name = "App alerts",
+            importance = NotificationManager.IMPORTANCE_HIGH,
+            description = "In-app and local alerts",
         )
+    }
+
+    private fun createChannel(
+        manager: NotificationManager,
+        id: String,
+        name: String,
+        importance: Int,
+        description: String,
+    ) {
+        val channel = NotificationChannel(id, name, importance).apply {
+            this.description = description
+            lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+            if (importance >= NotificationManager.IMPORTANCE_HIGH) {
+                enableLights(true)
+                enableVibration(true)
+            }
+        }
+        manager.createNotificationChannel(channel)
     }
 
     fun show(
@@ -51,6 +63,7 @@ internal object LocalNotificationPresenter {
         body: String,
         channelId: String,
         category: String? = null,
+        playSound: Boolean = true,
     ): Boolean {
         if (!NotificationPermissionGate.canDisplay(context)) {
             return false
@@ -65,14 +78,24 @@ internal object LocalNotificationPresenter {
             launchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
+        val highPriorityChannel = channelId == NotificationChannelIds.RIDE_STATUS ||
+            channelId == NotificationChannelIds.LOCAL_DEFAULT
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(context.applicationInfo.icon)
             .setContentTitle(title)
             .setContentText(body)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setDefaults(
+                if (playSound) {
+                    NotificationCompat.DEFAULT_ALL
+                } else {
+                    NotificationCompat.DEFAULT_LIGHTS
+                },
+            )
             .setPriority(
-                if (channelId == NotificationChannelIds.RIDE_STATUS) {
+                if (highPriorityChannel) {
                     NotificationCompat.PRIORITY_HIGH
                 } else {
                     NotificationCompat.PRIORITY_DEFAULT

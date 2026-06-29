@@ -29,6 +29,9 @@ public enum LocalNotificationPresenter {
             if playSound {
                 content.sound = .default
             }
+            if #available(iOS 15.0, *) {
+                content.interruptionLevel = .active
+            }
             let delay = max(NotificationLimits.minDelaySeconds, delaySeconds)
             let trigger = UNTimeIntervalNotificationTrigger(
                 timeInterval: TimeInterval(delay),

@@ -39,6 +39,8 @@ public class HovrLocalAndPushNotificationPlugin: NSObject, FlutterPlugin, Flutte
         switch call.method {
         case "getFcmToken":
             getFcmToken(result: result)
+        case "requestNotificationPermission":
+            requestNotificationPermission(result: result)
         case "showLocal":
             showLocal(call: call, result: result)
         case "cancelLocal":
@@ -108,6 +110,21 @@ public class HovrLocalAndPushNotificationPlugin: NSObject, FlutterPlugin, Flutte
                 return
             }
             result(token)
+        }
+    }
+
+    private func requestNotificationPermission(result: @escaping FlutterResult) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) {
+            granted, error in
+            if let error {
+                result(FlutterError(
+                    code: "NOTIFICATION_PERMISSION_ERROR",
+                    message: error.localizedDescription,
+                    details: nil
+                ))
+                return
+            }
+            result(granted)
         }
     }
 

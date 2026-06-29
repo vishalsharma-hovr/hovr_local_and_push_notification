@@ -5,6 +5,7 @@
 | Method | Required args | Optional args | Result | Errors |
 |--------|---------------|---------------|--------|--------|
 | `getFcmToken` | — | — | `String?` | `FCM_ERROR`, `FIREBASE_NOT_INITIALIZED` |
+| `requestNotificationPermission` | — | — | `bool` | `NOTIFICATION_PERMISSION_ERROR` (iOS) |
 | `showLocal` | `id`, `title`, `body` | `playSound`, `delaySeconds` | `bool` | `MISSING_ARG`, `INVALID_ARG` |
 | `cancelLocal` | `id` | — | `null` | `MISSING_ARG` |
 | `cancelAllLocal` | — | — | `null` | — |

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:hovr_local_and_push_notification/src/constants/channel_names.dart';
-import 'package:hovr_local_and_push_notification/src/constants/notification_channels.dart';
 
 void main() {
   final root = Directory.current;
@@ -17,6 +16,7 @@ void main() {
     (methodShowLocal, 'showLocal'),
     (methodCancelLocal, 'cancelLocal'),
     (methodCancelAllLocal, 'cancelAllLocal'),
+    (methodRequestNotificationPermission, 'requestNotificationPermission'),
   ];
 
   final dartChannel = File('lib/src/constants/channel_names.dart').readAsStringSync();

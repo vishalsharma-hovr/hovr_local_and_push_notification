@@ -1,17 +1,24 @@
 package com.hovr.hovr_local_and_push_notification
 
 import android.content.Context
+import androidx.activity.ComponentActivity
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-class HovrLocalAndPushNotificationPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
+class HovrLocalAndPushNotificationPlugin :
+    FlutterPlugin,
+    MethodChannel.MethodCallHandler,
+    ActivityAware {
     private lateinit var appContext: Context
     private lateinit var methodChannel: MethodChannel
     private val pushBuffer = PushEventBuffer()
+    private var permissionRequester: NotificationPermissionRequester? = null
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         appContext = binding.applicationContext
@@ -44,9 +51,29 @@ class HovrLocalAndPushNotificationPlugin : FlutterPlugin, MethodChannel.MethodCa
         }
     }
 
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        val activity = binding.activity
+        if (activity is ComponentActivity) {
+            permissionRequester = NotificationPermissionRequester(activity)
+        }
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        permissionRequester = null
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        onAttachedToActivity(binding)
+    }
+
+    override fun onDetachedFromActivity() {
+        permissionRequester = null
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             METHOD_GET_FCM_TOKEN -> getFcmToken(result)
+            METHOD_REQUEST_NOTIFICATION_PERMISSION -> requestNotificationPermission(result)
             METHOD_SHOW_LOCAL -> showLocal(call, result)
             METHOD_CANCEL_LOCAL -> cancelLocal(call, result)
             METHOD_CANCEL_ALL_LOCAL -> {
@@ -54,6 +81,17 @@ class HovrLocalAndPushNotificationPlugin : FlutterPlugin, MethodChannel.MethodCa
                 result.success(null)
             }
             else -> result.notImplemented()
+        }
+    }
+
+    private fun requestNotificationPermission(result: MethodChannel.Result) {
+        val requester = permissionRequester
+        if (requester == null) {
+            result.success(false)
+            return
+        }
+        requester.request { granted ->
+            result.success(granted)
         }
     }
 
@@ -105,6 +143,7 @@ class HovrLocalAndPushNotificationPlugin : FlutterPlugin, MethodChannel.MethodCa
             body = body,
             channelId = NotificationChannelIds.LOCAL_DEFAULT,
             category = android.app.Notification.CATEGORY_STATUS,
+            playSound = playSound,
         )
     }
 
@@ -120,6 +159,7 @@ class HovrLocalAndPushNotificationPlugin : FlutterPlugin, MethodChannel.MethodCa
 
     companion object {
         const val METHOD_GET_FCM_TOKEN = ChannelNames.GET_FCM_TOKEN
+        const val METHOD_REQUEST_NOTIFICATION_PERMISSION = ChannelNames.REQUEST_NOTIFICATION_PERMISSION
         const val METHOD_SHOW_LOCAL = ChannelNames.SHOW_LOCAL
         const val METHOD_CANCEL_LOCAL = ChannelNames.CANCEL_LOCAL
         const val METHOD_CANCEL_ALL_LOCAL = ChannelNames.CANCEL_ALL_LOCAL
