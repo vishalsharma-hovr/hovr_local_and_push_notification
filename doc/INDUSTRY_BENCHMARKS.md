@@ -14,7 +14,7 @@ Source of truth for notification channel IDs and v1/v2 scope. Enforced by `tool/
 |------------|-------------------|------------|----------|-----|
 | `hovr_ride_status` | Ride updates | HIGH | TRANSPORT | Yes — FCM push |
 | `hovr_ride_promo` | Offers & tips | LOW | PROMO | Constants only |
-| `hovr_local_default` | App alerts | DEFAULT | STATUS | Yes — local |
+| `hovr_local_default` | App alerts | HIGH | STATUS | Yes — local |
 
 ## v1 vs v2
 

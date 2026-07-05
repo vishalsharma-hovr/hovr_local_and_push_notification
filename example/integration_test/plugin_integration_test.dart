@@ -1,24 +1,30 @@
-// This is a basic Flutter integration test.
-//
-// Since integration tests run in a full Flutter application, they can interact
-// with the host side of a plugin implementation, unlike Dart unit tests.
-//
-// For more information about Flutter integration tests, please see
-// https://flutter.dev/to/integration-testing
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
-
 import 'package:hovr_local_and_push_notification/hovr_local_and_push_notification.dart';
+import 'package:integration_test/integration_test.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('getPlatformVersion test', (WidgetTester tester) async {
-    final HovrLocalAndPushNotification plugin = HovrLocalAndPushNotification();
-    final String? version = await plugin.getPlatformVersion();
-    // The version string depends on the host platform running the test, so
-    // just assert that some non-empty string is returned.
-    expect(version?.isNotEmpty, true);
+  testWidgets('plugin method channel smoke test', (WidgetTester tester) async {
+    final plugin = HovrLocalAndPushNotification();
+
+    final token = await plugin.getFcmToken();
+    expect(token, isA<String?>());
+
+    final shown = await plugin.showLocal(
+      id: 'integration-test',
+      title: 'Integration test',
+      body: 'Smoke test notification',
+    );
+    expect(shown, isA<bool>());
+
+    await plugin.cancelLocal('integration-test');
+    await plugin.cancelAllLocal();
+  });
+
+  testWidgets('pushEvents stream attaches', (WidgetTester tester) async {
+    final plugin = HovrLocalAndPushNotification();
+    final subscription = plugin.pushEvents.listen((_) {});
+    addTearDown(subscription.cancel);
   });
 }

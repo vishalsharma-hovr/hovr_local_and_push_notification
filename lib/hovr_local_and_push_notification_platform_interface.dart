@@ -20,6 +20,8 @@ abstract class HovrLocalAndPushNotificationPlatform extends PlatformInterface {
 
   Future<String?> getFcmToken();
 
+  Future<bool> requestNotificationPermission();
+
   Future<bool> showLocal({
     required String id,
     required String title,

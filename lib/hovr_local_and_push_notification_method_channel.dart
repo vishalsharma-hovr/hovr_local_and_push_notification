@@ -19,6 +19,14 @@ class MethodChannelHovrLocalAndPushNotification
   }
 
   @override
+  Future<bool> requestNotificationPermission() async {
+    final result = await methodChannel.invokeMethod<bool>(
+      methodRequestNotificationPermission,
+    );
+    return result ?? false;
+  }
+
+  @override
   Future<bool> showLocal({
     required String id,
     required String title,

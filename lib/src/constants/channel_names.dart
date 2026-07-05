@@ -5,3 +5,4 @@ const methodGetFcmToken = 'getFcmToken';
 const methodShowLocal = 'showLocal';
 const methodCancelLocal = 'cancelLocal';
 const methodCancelAllLocal = 'cancelAllLocal';
+const methodRequestNotificationPermission = 'requestNotificationPermission';
