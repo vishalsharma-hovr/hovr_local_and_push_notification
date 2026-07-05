@@ -67,6 +67,8 @@ LocalNotificationPresenter.show(
 
 ## Troubleshooting
 
+- **Background trip updates:** local notifications from the gRPC trip stream only fire while Dart is running. For updates while the app is backgrounded, the server must send FCM (see `doc/FCM_PAYLOAD.md`). The host should sync on resume (`SyncTripStatusNotificationEvent` in rider `TripBloc`).
+- Android channel importance is cached after first install — **clear app data or reinstall** after upgrading channel settings (e.g. lock-screen visibility)
 - iOS push: test on **physical device**; verify APNs `.p8` in Firebase and bundle ID match
 - `getFcmToken()` nil on iOS: ensure `setApnsToken` is called
 - OEM battery savers may block FCM on some Android devices
