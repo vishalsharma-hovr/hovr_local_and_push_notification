@@ -1,3 +1,9 @@
+## 0.1.4
+
+- Fix Android Gradle config so `HovrFirebaseMessagingService` is always packaged in release builds.
+- Remove standalone `settings.gradle` files from the plugin `android/` folder.
+- Add consumer ProGuard keep rules for the FCM service class.
+
 ## 0.1.2
 
 - Add `requestNotificationPermission()` and `postLocal()` with permission retry helper.

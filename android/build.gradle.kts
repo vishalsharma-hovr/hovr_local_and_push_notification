@@ -1,34 +1,13 @@
 group = "com.hovr.hovr_local_and_push_notification"
 version = "1.0-SNAPSHOT"
 
-buildscript {
-    val kotlinVersion = "2.2.20"
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("com.android.tools.build:gradle:8.11.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
 plugins {
     id("com.android.library")
-    id("kotlin-android")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
     namespace = "com.hovr.hovr_local_and_push_notification"
-
     compileSdk = 36
 
     compileOptions {
@@ -40,17 +19,9 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("src/main/kotlin")
-        }
-        getByName("test") {
-            java.srcDirs("src/test/kotlin")
-        }
-    }
-
     defaultConfig {
         minSdk = 24
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     testOptions {

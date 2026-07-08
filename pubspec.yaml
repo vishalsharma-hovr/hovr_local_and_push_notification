@@ -1,6 +1,6 @@
 name: hovr_local_and_push_notification
 description: Local and push (FCM) notifications for HOVR rider apps.
-version: 0.1.2
+version: 0.1.4
 homepage: https://github.com/vishalsharma-hovr/hovr_local_and_push_notification
 repository: https://github.com/vishalsharma-hovr/hovr_local_and_push_notification
 publish_to: none
