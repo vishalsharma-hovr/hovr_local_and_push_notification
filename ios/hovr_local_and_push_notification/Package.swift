@@ -11,11 +11,17 @@ let package = Package(
     products: [
         .library(name: "hovr-local-and-push-notification", targets: ["hovr_local_and_push_notification"])
     ],
-    dependencies: [],
+    dependencies: [
+        // Same SDK as firebase_core / firebase_messaging (from 12.6.0).
+        .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "12.6.0"),
+    ],
     targets: [
         .target(
             name: "hovr_local_and_push_notification",
-            dependencies: [],
+            dependencies: [
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseMessaging", package: "firebase-ios-sdk"),
+            ],
             resources: [
                 // If your plugin requires a privacy manifest, for example if it uses any required
                 // reason APIs, update the PrivacyInfo.xcprivacy file to describe your plugin's
