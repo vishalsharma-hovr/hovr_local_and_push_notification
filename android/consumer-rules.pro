@@ -1,0 +1,3 @@
+# Consumer ProGuard rules for hovr_local_and_push_notification
+-keep class com.hovr.hovr_local_and_push_notification.HovrFirebaseMessagingService { *; }
+-keep class com.hovr.hovr_local_and_push_notification.HovrLocalAndPushNotificationPlugin { *; }
