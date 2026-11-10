@@ -33,7 +33,8 @@ class PushNotificationEvent {
   final String? messageId;
 
   factory PushNotificationEvent.fromMap(Map<dynamic, dynamic> raw) {
-    final type = PushNotificationEventType.parse(raw['type'] as String?) ??
+    final type =
+        PushNotificationEventType.parse(raw['type'] as String?) ??
         PushNotificationEventType.message;
     final dataRaw = raw['data'];
     final data = dataRaw is Map

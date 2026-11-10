@@ -43,6 +43,8 @@ public class HovrLocalAndPushNotificationPlugin: NSObject, FlutterPlugin, Flutte
             requestNotificationPermission(result: result)
         case "showLocal":
             showLocal(call: call, result: result)
+        case "scheduleLocal":
+            scheduleLocal(call: call, result: result)
         case "cancelLocal":
             cancelLocal(call: call, result: result)
         case "cancelAllLocal":
@@ -164,6 +166,38 @@ public class HovrLocalAndPushNotificationPlugin: NSObject, FlutterPlugin, Flutte
             body: body,
             playSound: playSound,
             delaySeconds: delaySeconds
+        ) { success in
+            result(success)
+        }
+    }
+
+    private func scheduleLocal(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let id = args["id"] as? String, !id.isEmpty,
+              let title = args["title"] as? String, !title.isEmpty,
+              let body = args["body"] as? String, !body.isEmpty,
+              let fireAtMs = (args["fireAtEpochMs"] as? NSNumber)?.doubleValue
+        else {
+            result(FlutterError(
+                code: "MISSING_ARG",
+                message: "id, title, body, and fireAtEpochMs are required",
+                details: nil
+            ))
+            return
+        }
+        if id.count > NotificationLimits.maxIdLength ||
+            title.count > NotificationLimits.maxTitleLength ||
+            body.count > NotificationLimits.maxBodyLength
+        {
+            result(FlutterError(code: "INVALID_ARG", message: "Argument length exceeded", details: nil))
+            return
+        }
+        LocalNotificationPresenter.schedule(
+            id: id,
+            title: title,
+            body: body,
+            fireAt: Date(timeIntervalSince1970: fireAtMs / 1000),
+            playSound: args["playSound"] as? Bool ?? true
         ) { success in
             result(success)
         }

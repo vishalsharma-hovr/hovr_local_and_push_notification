@@ -4,9 +4,5 @@ abstract final class NotificationChannels {
   static const ridePromo = 'hovr_ride_promo';
   static const localDefault = 'hovr_local_default';
 
-  static const allV1 = <String>[
-    rideStatus,
-    ridePromo,
-    localDefault,
-  ];
+  static const allV1 = <String>[rideStatus, ridePromo, localDefault];
 }

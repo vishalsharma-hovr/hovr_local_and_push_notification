@@ -48,11 +48,31 @@ class MethodChannelHovrLocalAndPushNotification
   }
 
   @override
-  Future<void> cancelLocal(String id) {
-    return methodChannel.invokeMethod<void>(
-      methodCancelLocal,
-      <String, String>{'id': id},
+  Future<bool> scheduleLocal({
+    required String id,
+    required String title,
+    required String body,
+    required DateTime fireAt,
+    bool playSound = true,
+  }) async {
+    final result = await methodChannel.invokeMethod<bool>(
+      methodScheduleLocal,
+      <String, Object>{
+        'id': id,
+        'title': title,
+        'body': body,
+        'playSound': playSound,
+        'fireAtEpochMs': fireAt.millisecondsSinceEpoch,
+      },
     );
+    return result ?? false;
+  }
+
+  @override
+  Future<void> cancelLocal(String id) {
+    return methodChannel.invokeMethod<void>(methodCancelLocal, <String, String>{
+      'id': id,
+    });
   }
 
   @override
@@ -64,7 +84,9 @@ class MethodChannelHovrLocalAndPushNotification
   Stream<PushNotificationEvent> get pushEvents {
     return eventChannel.receiveBroadcastStream().map((event) {
       if (event is! Map) {
-        return const PushNotificationEvent(type: PushNotificationEventType.message);
+        return const PushNotificationEvent(
+          type: PushNotificationEventType.message,
+        );
       }
       return PushNotificationEvent.fromMap(event);
     });

@@ -38,7 +38,10 @@ Future<bool> postHovrLocalNotification({
 
   var shown = await attempt();
   if (!shown && requestPermissionOnFailure) {
-    log(name: tag, 'showLocal returned false — requesting notification permission');
+    log(
+      name: tag,
+      'showLocal returned false — requesting notification permission',
+    );
     final granted = await platform.requestNotificationPermission();
     if (granted) {
       shown = await attempt();

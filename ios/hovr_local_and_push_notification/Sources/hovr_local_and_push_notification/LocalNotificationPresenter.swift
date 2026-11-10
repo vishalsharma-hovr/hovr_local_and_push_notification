@@ -10,6 +10,55 @@ public enum LocalNotificationPresenter {
         delaySeconds: Int = 1,
         completion: ((Bool) -> Void)? = nil
     ) {
+        let delay = max(NotificationLimits.minDelaySeconds, delaySeconds)
+        // Deliver immediately so background suspension does not drop the request.
+        let trigger: UNNotificationTrigger? = delay <= NotificationLimits.minDelaySeconds
+            ? nil
+            : UNTimeIntervalNotificationTrigger(
+                timeInterval: TimeInterval(delay),
+                repeats: false
+            )
+        add(id: id, title: title, body: body, playSound: playSound, trigger: trigger, completion: completion)
+    }
+
+    /// Schedules a notification for `fireAt` (kept by iOS across app kills and reboots).
+    /// Completes with false for a past time, more than 30 days ahead, or when 64 are already pending.
+    public static func schedule(
+        id: String,
+        title: String,
+        body: String,
+        fireAt: Date,
+        playSound: Bool = true,
+        completion: ((Bool) -> Void)? = nil
+    ) {
+        let ahead = fireAt.timeIntervalSinceNow
+        guard ahead > 0, ahead <= NotificationLimits.maxScheduleAheadSeconds else {
+            DispatchQueue.main.async { completion?(false) }
+            return
+        }
+        UNUserNotificationCenter.current().getPendingNotificationRequests { pending in
+            let isReplacement = pending.contains { $0.identifier == id }
+            guard isReplacement || pending.count < NotificationLimits.maxScheduled else {
+                DispatchQueue.main.async { completion?(false) }
+                return
+            }
+            let components = Calendar.current.dateComponents(
+                [.year, .month, .day, .hour, .minute, .second],
+                from: fireAt
+            )
+            let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            add(id: id, title: title, body: body, playSound: playSound, trigger: trigger, completion: completion)
+        }
+    }
+
+    private static func add(
+        id: String,
+        title: String,
+        body: String,
+        playSound: Bool,
+        trigger: UNNotificationTrigger?,
+        completion: ((Bool) -> Void)?
+    ) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             let allowed: Bool
             switch settings.authorizationStatus {
@@ -32,14 +81,6 @@ public enum LocalNotificationPresenter {
             if #available(iOS 15.0, *) {
                 content.interruptionLevel = .active
             }
-            let delay = max(NotificationLimits.minDelaySeconds, delaySeconds)
-            // Deliver immediately so background suspension does not drop the request.
-            let trigger: UNNotificationTrigger? = delay <= NotificationLimits.minDelaySeconds
-                ? nil
-                : UNTimeIntervalNotificationTrigger(
-                    timeInterval: TimeInterval(delay),
-                    repeats: false
-                )
             let request = UNNotificationRequest(
                 identifier: id,
                 content: content,

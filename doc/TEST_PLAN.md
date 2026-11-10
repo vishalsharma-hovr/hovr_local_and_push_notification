@@ -25,3 +25,6 @@ cd android && ./gradlew :hovr_local_and_push_notification:testDebugUnitTest
 | 8 | Token refresh | pushEvents `token` |
 | 9 | Data-only FCM | Title/body from data |
 | 10 | Terminated tap | `getInitialMessage` routes |
+| 11 | `scheduleLocal` 2 min ahead, app killed | Banner at the time (Android: may be a few minutes late in Doze) |
+| 12 | `scheduleLocal` then reboot (Android) | Banner still shown after restart |
+| 13 | `scheduleLocal` then `cancelLocal` | Never shown |

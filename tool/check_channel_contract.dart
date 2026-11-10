@@ -14,6 +14,7 @@ void main() {
     (pushEventChannelName, 'ChannelNames.PUSH_EVENTS'),
     (methodGetFcmToken, 'getFcmToken'),
     (methodShowLocal, 'showLocal'),
+    (methodScheduleLocal, 'scheduleLocal'),
     (methodCancelLocal, 'cancelLocal'),
     (methodCancelAllLocal, 'cancelAllLocal'),
     (methodRequestNotificationPermission, 'requestNotificationPermission'),

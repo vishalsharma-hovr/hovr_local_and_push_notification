@@ -2,7 +2,7 @@
 
 Local and push (FCM) notifications for HOVR rider apps — show on-device banners, receive FCM push, and stream tap/token events to Dart.
 
-**Features:** `showLocal`, `postLocal`, `requestNotificationPermission`, `cancelLocal`, `cancelAllLocal`, `getFcmToken`, `pushEvents`
+**Features:** `showLocal`, `postLocal`, `scheduleLocal`, `requestNotificationPermission`, `cancelLocal`, `cancelAllLocal`, `getFcmToken`, `pushEvents`
 
 ## Usage
 
@@ -45,6 +45,22 @@ await notifications.showLocal(
   body: 'Your location is being sent every few seconds.',
 );
 ```
+
+Schedule one for a set time (kept when the app is closed; on Android also set
+again after a reboot). It returns `false` for a past time, more than 30 days
+ahead, 64 already waiting, or no permission. `cancelLocal(id)` cancels it:
+
+```dart
+await notifications.scheduleLocal(
+  id: 'trip_42_2h',
+  title: 'Scheduled ride in 2 hours',
+  body: 'Pickup 4:30 pm at 100 Queen St W',
+  fireAt: pickupAt.subtract(const Duration(hours: 2)),
+);
+```
+
+Android uses an inexact alarm (no exact-alarm permission), so a sleeping phone
+may show it a few minutes late.
 
 ## Documentation
 

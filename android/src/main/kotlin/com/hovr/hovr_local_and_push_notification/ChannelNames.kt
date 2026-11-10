@@ -6,6 +6,7 @@ object ChannelNames {
 
     const val GET_FCM_TOKEN = "getFcmToken"
     const val SHOW_LOCAL = "showLocal"
+    const val SCHEDULE_LOCAL = "scheduleLocal"
     const val CANCEL_LOCAL = "cancelLocal"
     const val CANCEL_ALL_LOCAL = "cancelAllLocal"
     const val REQUEST_NOTIFICATION_PERMISSION = "requestNotificationPermission"

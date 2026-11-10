@@ -75,9 +75,11 @@ class HovrLocalAndPushNotificationPlugin :
             METHOD_GET_FCM_TOKEN -> getFcmToken(result)
             METHOD_REQUEST_NOTIFICATION_PERMISSION -> requestNotificationPermission(result)
             METHOD_SHOW_LOCAL -> showLocal(call, result)
+            METHOD_SCHEDULE_LOCAL -> scheduleLocal(call, result)
             METHOD_CANCEL_LOCAL -> cancelLocal(call, result)
             METHOD_CANCEL_ALL_LOCAL -> {
                 LocalNotificationPresenter.cancelAll(appContext)
+                ScheduledNotificationScheduler.cancelAll(appContext)
                 result.success(null)
             }
             else -> result.notImplemented()
@@ -135,6 +137,36 @@ class HovrLocalAndPushNotificationPlugin :
         result.success(postLocal(id, title, body, playSound))
     }
 
+    private fun scheduleLocal(call: MethodCall, result: MethodChannel.Result) {
+        val id = call.argument<String>("id")
+        val title = call.argument<String>("title")
+        val body = call.argument<String>("body")
+        val fireAt = call.argument<Number>("fireAtEpochMs")?.toLong()
+        if (id.isNullOrBlank() || title.isNullOrBlank() || body.isNullOrBlank() || fireAt == null) {
+            result.error("MISSING_ARG", "id, title, body, and fireAtEpochMs are required", null)
+            return
+        }
+        if (id.length > NotificationLimits.MAX_ID_LENGTH ||
+            title.length > NotificationLimits.MAX_TITLE_LENGTH ||
+            body.length > NotificationLimits.MAX_BODY_LENGTH
+        ) {
+            result.error("INVALID_ARG", "Argument length exceeded", null)
+            return
+        }
+        if (!NotificationPermissionGate.canDisplay(appContext)) {
+            result.success(false)
+            return
+        }
+        val entry = ScheduledNotification(
+            id = id,
+            title = title,
+            body = body,
+            fireAtEpochMs = fireAt,
+            playSound = call.argument<Boolean>("playSound") ?: true,
+        )
+        result.success(ScheduledNotificationScheduler.schedule(appContext, entry, System.currentTimeMillis()))
+    }
+
     private fun postLocal(id: String, title: String, body: String, playSound: Boolean): Boolean {
         return LocalNotificationPresenter.show(
             context = appContext,
@@ -154,6 +186,7 @@ class HovrLocalAndPushNotificationPlugin :
             return
         }
         LocalNotificationPresenter.cancel(appContext, id)
+        ScheduledNotificationScheduler.cancel(appContext, id)
         result.success(null)
     }
 
@@ -161,6 +194,7 @@ class HovrLocalAndPushNotificationPlugin :
         const val METHOD_GET_FCM_TOKEN = ChannelNames.GET_FCM_TOKEN
         const val METHOD_REQUEST_NOTIFICATION_PERMISSION = ChannelNames.REQUEST_NOTIFICATION_PERMISSION
         const val METHOD_SHOW_LOCAL = ChannelNames.SHOW_LOCAL
+        const val METHOD_SCHEDULE_LOCAL = ChannelNames.SCHEDULE_LOCAL
         const val METHOD_CANCEL_LOCAL = ChannelNames.CANCEL_LOCAL
         const val METHOD_CANCEL_ALL_LOCAL = ChannelNames.CANCEL_ALL_LOCAL
 
