@@ -30,6 +30,19 @@ abstract class HovrLocalAndPushNotificationPlatform extends PlatformInterface {
     int delaySeconds = 1,
   });
 
+  /// Schedules a local notification for [fireAt]; it survives the app being
+  /// closed. Returns false when notifications are not allowed or [fireAt] is
+  /// not in the future. `cancelLocal` with the same [id] cancels it.
+  Future<bool> scheduleLocal({
+    required String id,
+    required String title,
+    required String body,
+    required DateTime fireAt,
+    bool playSound = true,
+  }) {
+    throw UnimplementedError('scheduleLocal() has not been implemented.');
+  }
+
   Future<void> cancelLocal(String id);
 
   Future<void> cancelAllLocal();

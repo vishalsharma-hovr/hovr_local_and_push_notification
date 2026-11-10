@@ -84,6 +84,8 @@ internal object LocalNotificationPresenter {
             .setSmallIcon(context.applicationInfo.icon)
             .setContentTitle(title)
             .setContentText(body)
+            // Expandable so multi-line bodies (e.g. pickup and drop-off) are readable.
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

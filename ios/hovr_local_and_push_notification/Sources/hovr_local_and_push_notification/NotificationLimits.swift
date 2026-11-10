@@ -7,6 +7,9 @@ enum NotificationLimits {
     static let maxBodyLength = 512
     static let minDelaySeconds = 1
     static let maxDelaySeconds = 3600
+    /// iOS keeps at most 64 pending local notifications per app.
+    static let maxScheduled = 64
+    static let maxScheduleAheadSeconds: TimeInterval = 30 * 24 * 60 * 60
 }
 
 enum NotificationChannelIds {

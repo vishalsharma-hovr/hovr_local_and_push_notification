@@ -9,7 +9,7 @@ export 'src/models/push_notification_event.dart';
 
 class HovrLocalAndPushNotification {
   HovrLocalAndPushNotification({HovrLocalAndPushNotificationPlatform? platform})
-      : _platform = platform ?? HovrLocalAndPushNotificationPlatform.instance;
+    : _platform = platform ?? HovrLocalAndPushNotificationPlatform.instance;
 
   final HovrLocalAndPushNotificationPlatform _platform;
 
@@ -56,6 +56,27 @@ class HovrLocalAndPushNotification {
     );
   }
 
+  /// Schedules a local notification for [fireAt] (survives the app closing
+  /// and, on Android, a phone restart). Returns false when notifications are
+  /// not allowed, [fireAt] is in the past or more than 30 days ahead, or 64
+  /// notifications are already scheduled. `cancelLocal(id)` cancels it.
+  Future<bool> scheduleLocal({
+    required String id,
+    required String title,
+    required String body,
+    required DateTime fireAt,
+    bool playSound = true,
+  }) {
+    return _platform.scheduleLocal(
+      id: id,
+      title: title,
+      body: body,
+      fireAt: fireAt,
+      playSound: playSound,
+    );
+  }
+
+  /// Cancels a shown or scheduled local notification.
   Future<void> cancelLocal(String id) => _platform.cancelLocal(id);
 
   Future<void> cancelAllLocal() => _platform.cancelAllLocal();
